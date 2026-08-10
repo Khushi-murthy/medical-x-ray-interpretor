@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEDVISION AI | Chest X-Ray Interpreter</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:28px;font-family:Arial,Helvetica,sans-serif;color:#fff;background:radial-gradient(circle at 8% 15%,#7ad4ff40,transparent 22%),radial-gradient(circle at 92% 18%,#ff84ff30,transparent 20%),linear-gradient(170deg,#081024 0%,#091a35 48%,#14294e 100%);background-size:cover;animation:backgroundShift 20s ease infinite;perspective:1800px;perspective-origin:center top;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:52px 52px}
+@keyframes backgroundShift{0%{background-position:0% 0%,100% 100%,0% 50%}50%{background-position:5% 10%,95% 90%,100% 50%}100%{background-position:0% 0%,100% 100%,0% 50%}}
+.header,.container{max-width:1200px;margin:auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.brand h1{font-size:32px;letter-spacing:3px;margin:0;background:linear-gradient(90deg,#00c6ff,#4facfe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand p{color:#94a3b8;margin:6px 0 0}
+.status{padding:10px 16px;border-radius:30px;background:#00ff9510;border:1px solid #00ff9540;color:#7dffbd;font-size:12px}
+.status-dot{display:inline-block;width:8px;height:8px;background:#00ff95;border-radius:50%;margin-right:7px;box-shadow:0 0 12px #00ff95}
+.glass{background:rgba(6,19,37,.92);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(22px);border-radius:28px;box-shadow:0 26px 90px rgba(0,0,0,.35);transition:transform .35s ease,box-shadow .35s ease,background-color .35s ease;position:relative;overflow:hidden}
+.glass:hover{transform:translateY(-6px);box-shadow:0 34px 110px rgba(0,0,0,.45);background:rgba(16,34,60,.96)}
+.upload-card{padding:42px;text-align:center;margin-bottom:25px}
+.upload-card::before{content:"";position:absolute;inset:-24px;background:radial-gradient(circle,#4facfe44,transparent 42%);opacity:.18;filter:blur(30px);animation:floatGlow 7s ease-in-out infinite;pointer-events:none}
+.viewer-card{padding:25px;min-height:430px;transition:transform .35s ease,box-shadow .35s ease;position:relative}
+.viewer-card:hover{transform:translateY(-3px)}
+.viewer-card::after{content:"";position:absolute;inset:0;border-radius:28px;background:linear-gradient(135deg,rgba(109,214,255,.06),transparent 40%,rgba(125,91,255,.06));pointer-events:none}
+.results{padding:35px;display:none;opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+.results.visible{display:block;opacity:1;transform:translateY(0)}
+#predictBtn{margin-top:23px;padding:15px 42px;border:0;border-radius:14px;font-size:16px;font-weight:bold;color:#fff;cursor:pointer;background:linear-gradient(135deg,#6d9eff,#8c4cff);box-shadow:0 10px 30px rgba(55,96,255,.28);transition:transform .25s ease,box-shadow .25s ease,background .35s ease}
+#predictBtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 36px rgba(55,96,255,.38);background:linear-gradient(135deg,#6dd6ff,#c28cff)}
+#downloadPDF{margin-top:22px;padding:13px 24px;border:0;border-radius:12px;background:linear-gradient(135deg,#6dd6ff,#7d5bff);color:#fff;cursor:pointer;font-weight:bold;transition:transform .25s ease,box-shadow .25s ease,opacity .35s ease}
+#downloadPDF:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(109,214,255,.3)}
+#downloadPDF:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.upload-card h2{font-size:28px}.upload-card>p{color:#94a3b8;margin-bottom:28px}
+#downloadPDF{margin-top:22px;padding:13px 24px;border:0;border-radius:12px;background:#2563eb;color:#fff;cursor:pointer;font-weight:bold}
+.status-dot{animation:pulse 1.8s ease-in-out infinite}
+.upload-area{transition:transform .3s ease,box-shadow .3s ease}
+.upload-area:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 18px 40px rgba(0,198,255,.18)}
+.report-box{animation:fadeIn .75s ease both}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.3);opacity:1}}
+@keyframes floatGlow{0%,100%{transform:translateY(0px)}50%{transform:translateY(14px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.upload-area{min-height:210px;border:2px dashed #00c6ff70;border-radius:20px;cursor:pointer;background:#00c6ff09;display:flex;align-items:center;justify-content:center}
+.upload-area:hover,.upload-area.dragging{border-color:#00c6ff;background:#00c6ff15}
+.upload-icon{font-size:55px}.upload-content h3{font-size:20px}.upload-content p{color:#94a3b8}
+#image{display:none}
+.selected-file{margin-top:16px;padding:12px;border-radius:12px;background:#00c6ff12;color:#8eeaff;display:none}
+#preview-container{display:none;margin-top:28px}
+#preview{width:100%;max-height:500px;object-fit:contain;border-radius:18px;background:#020817;border:1px solid #ffffff19}
+#predictBtn{margin-top:23px;padding:15px 42px;border:0;border-radius:14px;font-size:16px;font-weight:bold;color:#fff;cursor:pointer;background:linear-gradient(135deg,#00a8ff,#2563eb);box-shadow:0 10px 30px #008cff40}
+#predictBtn:disabled{opacity:.35;cursor:not-allowed}
+#connectionStatus{margin-top:15px;min-height:20px;color:#94a3b8;font-size:13px}
+.viewer{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:25px}
+.viewer-card{padding:25px;min-height:430px}
+.viewer-card h3{margin:0 0 18px;color:#cbd5e1}
+.viewer-image{width:100%;height:350px;object-fit:contain;border-radius:15px;background:#020817;border:1px solid #ffffff12;display:none}
+.empty-view{height:350px;display:flex;justify-content:center;align-items:center;color:#64748b;border:1px dashed #ffffff19;border-radius:15px;text-align:center;padding:20px}
+#gradcamImage{display:none;width:100%;height:350px;object-fit:contain;border-radius:15px;background:#020817}
+.results{padding:35px;display:none}
+.primary-result{margin-bottom:30px;padding:24px;border-radius:18px;background:#00c6ff12;border:1px solid #00c6ff33}
+.primary-label{font-size:12px;color:#7ddfff;letter-spacing:2px}.primary-disease{font-size:30px;font-weight:bold;margin-top:8px}.primary-score{color:#94a3b8;margin-top:7px}
+.disease-card{margin-bottom:17px}.disease-name{display:flex;justify-content:space-between;margin-bottom:7px}.progress{height:11px;background:#16263b;border-radius:20px;overflow:hidden}.progress-fill{width:0;height:100%;border-radius:20px;background:linear-gradient(90deg,#00c6ff,#2563eb);transition:width 1.1s}
+.report-box{margin-top:25px;padding:20px;border-radius:15px;background:#ffffff08;color:#cbd5e1;line-height:1.7}
+#loader{position:fixed;inset:0;background:#020817dd;backdrop-filter:blur(10px);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:1000}
+.spinner{width:62px;height:62px;border:4px solid #ffffff19;border-top-color:#00c6ff;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:800px){body{padding:15px}.header{flex-direction:column;gap:18px;text-align:center}.viewer{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="header">
+<div class="brand"><h1>MEDVISION AI</h1><p>AI-Powered Chest X-Ray Interpreter</p></div>
+<div class="status"><span class="status-dot"></span>AI SYSTEM ONLINE</div>
+</header>
+
+<main class="container">
+
+<section class="upload-card glass">
+<h2>Chest X-Ray Analysis</h2>
+<p>Upload a chest X-ray and let MEDVISION AI analyze it.</p>
+
+<label for="image" class="upload-area" id="uploadArea">
+<div class="upload-content">
+<div class="upload-icon">🩻</div>
+<h3>Click to Select X-Ray</h3>
+<p>PNG, JPG or JPEG</p>
+</div>
+</label>
+
+<input type="file" id="image" accept="image/png,image/jpeg,image/jpg">
+<div id="selectedFile" class="selected-file"></div>
+
+<div id="preview-container">
+<h3>Selected X-Ray</h3>
+<img id="preview" alt="Selected X-ray">
+</div>
+
+<button id="predictBtn" type="button" disabled onclick="analyzeXray()">Analyze X-Ray</button>
+<div id="connectionStatus"></div>
+</section>
+
+<section class="viewer">
+
+<div class="viewer-card glass">
+<h3>Original X-Ray</h3>
+<div id="originalEmpty" class="empty-view">The analyzed X-ray will appear here.</div>
+<img id="originalImage" class="viewer-image" alt="Original X-ray">
+</div>
+
+<div class="viewer-card glass">
+<h3>Explainable AI • Grad-CAM</h3>
+<div id="gradcamEmpty" class="empty-view">Heatmap will appear here after analysis.</div>
+<img id="gradcamImage" class="viewer-image" alt="Grad-CAM heatmap">
+</div>
+
+</section>
+
+<section id="results" class="results glass">
+<h2>AI Prediction Results</h2>
+<div id="primaryResult"></div>
+<div id="predictionBars"></div>
+<div id="report"></div>
+<button id="downloadPDF" type="button">📄 Download Report</button>
+</section>
+
+<section id="diseaseChat" class="glass">
+<h2>Ask About a Disease</h2>
+<div class="chat-panel">
+    <div id="chatMessages" class="chat-messages">
+        <div class="chat-bubble system">Ask about a disease name or chest X-ray finding. Example: "What does Pneumonia mean?"</div>
+    </div>
+    <div class="chat-input-row">
+        <input id="chatInput" type="text" placeholder="Ask about a disease, symptom, or finding...">
+        <button id="chatSend" type="button">Ask</button>
+    </div>
+</div>
+</section>
+
+</main>
+
+<div id="loader"><div class="spinner"></div><p id="loaderText">Connecting to MEDVISION AI...</p></div>
+
+<script>
+const API_BASE="http://127.0.0.1:5000";
+
+const fileInput=document.getElementById("image");
+const uploadArea=document.getElementById("uploadArea");
+const preview=document.getElementById("preview");
+const previewContainer=document.getElementById("preview-container");
+const selectedFile=document.getElementById("selectedFile");
+const predictBtn=document.getElementById("predictBtn");
+const connectionStatus=document.getElementById("connectionStatus");
+const loader=document.getElementById("loader");
+const loaderText=document.getElementById("loaderText");
+const results=document.getElementById("results");
+const predictionBars=document.getElementById("predictionBars");
+const primaryResult=document.getElementById("primaryResult");
+const report=document.getElementById("report");
+const originalImage=document.getElementById("originalImage");
+const originalEmpty=document.getElementById("originalEmpty");
+const gradcamImage=document.getElementById("gradcamImage");
+const gradcamEmpty=document.getElementById("gradcamEmpty");
+const downloadPDF=document.getElementById("downloadPDF");
+const chatInput=document.getElementById("chatInput");
+const chatSend=document.getElementById("chatSend");
+const chatMessages=document.getElementById("chatMessages");
+let latestAnalysis=null;
+
+console.log("MEDVISION AI FRONTEND LOADED");
+
+
+fileInput.addEventListener("change",function(){
+    const file=this.files[0];
+    if(!file)return;
+
+    if(!file.type.startsWith("image/")){
+        alert("Please select a valid image.");
+        fileInput.value="";
+        return;
+    }
+
+    const url=URL.createObjectURL(file);
+
+    preview.src=url;
+    originalImage.src=url;
+
+    previewContainer.style.display="block";
+    originalImage.style.display="block";
+    originalEmpty.style.display="none";
+
+    gradcamImage.style.display="none";
+    gradcamEmpty.style.display="flex";
+    gradcamEmpty.textContent="Heatmap will appear here after analysis.";
+
+    selectedFile.textContent="✓ Selected: "+file.name;
+    selectedFile.style.display="block";
+
+    predictBtn.disabled=false;
+
+    uploadArea.querySelector("h3").textContent="✓ X-Ray Selected";
+    uploadArea.querySelector("p").textContent="Click to choose another image";
+
+    connectionStatus.textContent="Image ready. Click Analyze X-Ray.";
+    connectionStatus.style.color="#7ddfff";
+    downloadPDF.disabled=true;
+    console.log("IMAGE PREVIEW SUCCESS");
+});
+
+uploadArea.addEventListener("dragover",e=>{
+    e.preventDefault();
+    uploadArea.classList.add("dragging");
+});
+
+uploadArea.addEventListener("dragleave",()=>{
+    uploadArea.classList.remove("dragging");
+});
+
+uploadArea.addEventListener("drop",e=>{
+    e.preventDefault();
+    uploadArea.classList.remove("dragging");
+    if(e.dataTransfer.files.length){
+        fileInput.files=e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event("change"));
+    }
+});
+
+async function analyzeXray(){
+
+    const file=fileInput.files[0];
+
+    if(!file){
+        alert("Please select an X-ray image first.");
+        return;
+    }
+
+    console.log("========== ANALYZE BUTTON CLICKED ==========");
+
+    loader.style.display="flex";
+    connectionStatus.textContent="Connecting to MEDVISION AI...";
+    connectionStatus.style.color="#7ddfff";
+
+    try{
+
+        const health=await fetch(API_BASE+"/health",{cache:"no-store"});
+
+        if(!health.ok){
+            throw new Error("Flask health check failed: HTTP "+health.status);
+        }
+
+        loaderText.textContent="Running DenseNet121 analysis...";
+
+        const formData=new FormData();
+        formData.append("image",file);
+
+        const response=await fetch(API_BASE+"/predict",{
+            method:"POST",
+            body:formData,
+            cache:"no-store"
+        });
+
+        const text=await response.text();
+
+        if(!response.ok){
+            throw new Error("Prediction failed: HTTP "+response.status+"\\n"+text);
+        }
+
+        const data=JSON.parse(text);
+
+        console.log("PREDICTION RECEIVED:",data);
+
+        displayResults(data);
+
+        // Use the Grad-CAM URL returned by Flask.
+        // Do not call /gradcam directly.
+        if(data.gradcam){
+            let gradcamUrl = String(data.gradcam);
+
+            if(!gradcamUrl.startsWith("http://") &&
+               !gradcamUrl.startsWith("https://")){
+                gradcamUrl = API_BASE + (
+                    gradcamUrl.startsWith("/") ? gradcamUrl : "/" + gradcamUrl
+                );
+            }
+
+            gradcamImage.onload=function(){
+                gradcamImage.style.display="block";
+                gradcamEmpty.style.display="none";
+            };
+
+            gradcamImage.onerror=function(){
+                gradcamImage.style.display="none";
+                gradcamEmpty.style.display="flex";
+                gradcamEmpty.textContent="Grad-CAM could not be loaded for this analysis.";
+            };
+
+            gradcamImage.src=gradcamUrl + (
+                gradcamUrl.includes("?") ? "&" : "?"
+            ) + "t=" + Date.now();
+
+        }else{
+            gradcamImage.style.display="none";
+            gradcamEmpty.style.display="flex";
+            gradcamEmpty.textContent="Grad-CAM is not available for this result.";
+        }
+
+        connectionStatus.textContent="✓ Analysis completed successfully.";
+        connectionStatus.style.color="#7dffbd";
+        downloadPDF.disabled=false;
+
+    }catch(error){
+
+        console.error("MEDVISION AI ERROR:",error);
+
+        connectionStatus.textContent="✕ "+error.message;
+        connectionStatus.style.color="#ff8f8f";
+
+        alert("Analysis failed.\\n\\n"+error.message);
+
+    }finally{
+
+        loader.style.display="none";
+
+    }
+}
+
+function displayResults(data){
+
+    latestAnalysis = data;
+    results.classList.add('visible');
+    results.style.display = 'block';
+    predictionBars.innerHTML="";
+    report.innerHTML="";
+
+    // Flask normally returns the prediction inside data.prediction.
+    // This also supports the older direct response format.
+    const prediction = data.prediction || data;
+
+    const predictions =
+        prediction.predictions ||
+        data.predictions ||
+        {};
+
+    const entries = Object.entries(predictions)
+        .filter(([disease,value]) =>
+            typeof value === "number" && Number.isFinite(value)
+        )
+        .sort((a,b)=>b[1]-a[1]);
+
+    if(!entries.length){
+
+        primaryResult.innerHTML=`
+            <div class="primary-result">
+                <div class="primary-label">MODEL RESULT</div>
+                <div class="primary-disease">No prediction returned</div>
+                <div class="primary-score">
+                    The backend did not return the 14 disease probabilities.
+                </div>
+            </div>
+        `;
+
+        report.innerHTML=`
+            <div class="report-box">
+                <strong>AI Summary</strong><br>
+                No prediction data was returned by the model.
+                Please check the Flask terminal.
+            </div>
+        `;
+
+        results.scrollIntoView({behavior:"smooth"});
+        return;
+    }
+
+    // Model probabilities are decimals.
+    // Example: 0.002764 = 0.2764%.
+    const calibratedDetection =
+        Boolean(
+            prediction.calibrated_detection ??
+            prediction.finding_detected ??
+            false
+        );
+
+    const rawTopDisease =
+        prediction.raw_top_disease ||
+        prediction.top_disease ||
+        entries[0][0];
+
+    const rawTopProbability =
+        typeof prediction.raw_top_probability === "number"
+            ? prediction.raw_top_probability
+            : (
+                typeof prediction.top_probability === "number"
+                    ? prediction.top_probability
+                    : entries[0][1]
+            );
+
+    const detectedDisease =
+        prediction.top_disease || rawTopDisease;
+
+    const detectedProbability =
+        typeof prediction.top_probability === "number"
+            ? prediction.top_probability
+            : rawTopProbability;
+
+    const threshold =
+        typeof prediction.threshold === "number"
+            ? prediction.threshold
+            : null;
+
+
+    if(calibratedDetection){
+
+        primaryResult.innerHTML=`
+            <div class="primary-result">
+                <div class="primary-label">CALIBRATED MODEL RESULT</div>
+
+                <div class="primary-disease">
+                    ${formatName(detectedDisease)}
+                </div>
+
+                <div class="primary-score">
+                    Model score:
+                    <strong>${(detectedProbability*100).toFixed(4)}%</strong>
+
+                    ${
+                        threshold !== null
+                        ? `
+                            &nbsp; • &nbsp;
+                            Detection threshold:
+                            <strong>${(threshold*100).toFixed(4)}%</strong>
+                          `
+                        : ""
+                    }
+                </div>
+            </div>
+        `;
+
+    }else{
+
+        primaryResult.innerHTML=`
+            <div class="primary-result">
+                <div class="primary-label">CALIBRATED MODEL RESULT</div>
+
+                <div class="primary-disease">
+                    No confident finding detected
+                </div>
+
+                <div class="primary-score">
+                    Highest raw model output:
+                    <strong>${formatName(rawTopDisease)}</strong>
+                    —
+                    <strong>${(rawTopProbability*100).toFixed(4)}%</strong>
+
+                    ${
+                        threshold !== null
+                        ? `
+                            <br>
+                            Required threshold:
+                            <strong>${(threshold*100).toFixed(4)}%</strong>
+                          `
+                        : ""
+                    }
+                </div>
+            </div>
+        `;
+    }
+
+
+    entries.forEach(([disease,value],i)=>{
+
+        const pct=Math.max(
+            0,
+            Math.min(100,value*100)
+        );
+
+        const card=document.createElement("div");
+        card.className="disease-card";
+
+        card.innerHTML=`
+            <div class="disease-name">
+                <span>${formatName(disease)}</span>
+                <strong>${pct.toFixed(4)}%</strong>
+            </div>
+
+            <div class="progress">
+                <div class="progress-fill"></div>
+            </div>
+        `;
+
+        predictionBars.appendChild(card);
+
+        setTimeout(()=>{
+            card.querySelector(".progress-fill").style.width =
+                pct + "%";
+        },100+i*70);
+
+    });
+
+
+    if(calibratedDetection){
+
+        report.innerHTML=`
+            <div class="report-box">
+
+                <strong>AI Summary</strong><br><br>
+
+                The calibrated model identified
+                <strong>${formatName(detectedDisease)}</strong>
+                as the highest-confidence finding.
+
+                <br><br>
+
+                Model score:
+                <strong>${(detectedProbability*100).toFixed(4)}%</strong>
+
+                ${
+                    threshold !== null
+                    ? `
+                        <br>
+                        Detection threshold:
+                        <strong>${(threshold*100).toFixed(4)}%</strong>
+                      `
+                    : ""
+                }
+
+                <br><br>
+
+                This is an AI screening result, not a medical diagnosis.
+                A qualified healthcare professional must review the
+                X-ray before any clinical decision is made.
+
+            </div>
+        `;
+
+    }else{
+
+        report.innerHTML=`
+            <div class="report-box">
+
+                <strong>AI Summary</strong><br><br>
+
+                The model's highest raw output was
+                <strong>${formatName(rawTopDisease)}</strong>
+                at
+                <strong>${(rawTopProbability*100).toFixed(4)}%</strong>.
+
+                <br><br>
+
+                This score is below the calibrated detection threshold,
+                so the system has <strong>not classified this X-ray as
+                having a confident finding</strong>.
+
+                ${
+                    threshold !== null
+                    ? `
+                        <br>
+                        Required threshold:
+                        <strong>${(threshold*100).toFixed(4)}%</strong>
+                      `
+                    : ""
+                }
+
+                <br><br>
+
+                This output is for research and educational purposes
+                only and must be reviewed by a qualified healthcare
+                professional.
+
+            </div>
+        `;
+    }
+
+    results.scrollIntoView({behavior:"smooth"});
+}
+
+
+function formatName(name){
+    return String(name).replace(/_/g," ");
+}
+
+document.getElementById("downloadPDF").addEventListener("click",async()=>{
+    if(!latestAnalysis){
+        alert("No analysis available yet. Please run the X-ray analysis first.");
+        return;
+    }
+
+    try{
+        const response = await fetch(API_BASE+"/download-report",{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(latestAnalysis)
+        });
+
+        if(!response.ok){
+            const errorText = await response.text();
+            throw new Error("Download failed: HTTP "+response.status+"\n"+errorText);
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "MEDVISION_AI_Report.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }catch(e){
+        console.error(e);
+        alert("Report download failed.\n\n"+e.message);
+    }
+});
+
+chatSend.addEventListener("click",sendChatQuery);
+chatInput.addEventListener("keyup",event=>{
+    if(event.key === "Enter"){
+        sendChatQuery();
+    }
+});
+
+function renderChatBubble(text, type){
+    const bubble=document.createElement("div");
+    bubble.className="chat-bubble "+type;
+    bubble.textContent=text;
+    chatMessages.appendChild(bubble);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function sendChatQuery(){
+    const query = chatInput.value.trim();
+    if(!query){
+        return;
+    }
+
+    renderChatBubble(query, "user");
+    chatInput.value = "";
+
+    try{
+        const response = await fetch(API_BASE+"/disease-chat",{
+            method: "POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({query})
+        });
+
+        if(!response.ok){
+            const text = await response.text();
+            throw new Error(text || "Chat request failed.");
+        }
+
+        const data = await response.json();
+        renderChatBubble(data.answer || "No response from server.", "bot");
+    }catch(error){
+        console.error(error);
+        renderChatBubble("Sorry, I couldn't retrieve a chat answer right now.", "bot");
+    }
+}
+</script>
+</body>
+</html>

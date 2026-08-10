@@ -1,0 +1,10 @@
+=============================
+AI MEDICAL REPORT
+=============================
+
+Result: No major disease detected.
+
+Recommendation:
+- Continue regular health checkups.
+- Maintain healthy lifestyle.
+- Consult doctor if symptoms persist.

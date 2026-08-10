@@ -1,0 +1,15 @@
+Disease,Best Threshold
+Atelectasis,0.17988281
+Cardiomegaly,0.092365935
+Consolidation,0.094164275
+Edema,0.111305386
+Effusion,0.3161116
+Emphysema,0.102542125
+Fibrosis,0.056806
+Hernia,0.035011284
+Infiltration,0.2352473
+Mass,0.105771594
+Nodule,0.14657141
+Pleural_Thickening,0.101057604
+Pneumonia,0.036833875
+Pneumothorax,0.18982303

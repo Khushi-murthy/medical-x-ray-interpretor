@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Environment
+venv/
+
+# Models
+models/
+checkpoints/
+
+# Dataset
+dataset/raw/
+
+# Output Files
+outputs/
+
+# Logs
+logs/
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Windows
+Thumbs.db
+
+# macOS
+.DS_Store

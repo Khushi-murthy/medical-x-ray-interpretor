@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MedVision AI</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                #06101d;
+
+            color: #f4f7fb;
+
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                );
+
+            background-size: 32px 32px;
+
+            z-index: -1;
+        }
+
+        .container {
+            width: min(1500px, 94%);
+
+            margin: 0 auto;
+
+            padding:
+                30px
+                0
+                60px;
+        }
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            margin-bottom: 30px;
+        }
+
+        .brand {
+            font-size: 30px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                -0.5px;
+        }
+
+        .brand span {
+            color: #25b8ff;
+        }
+
+        .subtitle {
+            color: #8da0b8;
+
+            font-size: 14px;
+
+            margin-top: 5px;
+        }
+
+        /* =====================================================
+           MAIN GRID
+        ===================================================== */
+
+        .main-grid {
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                1fr;
+
+            gap: 24px;
+
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background:
+                #0d1c2e;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.07);
+
+            border-radius:
+                24px;
+
+            padding:
+                28px;
+
+            box-shadow:
+                0 15px 40px
+                rgba(0,0,0,0.20);
+        }
+
+        .card-title {
+            font-size: 24px;
+
+            font-weight: 700;
+
+            margin-bottom: 22px;
+        }
+
+        /* =====================================================
+           UPLOAD AREA
+        ===================================================== */
+
+        .upload-area {
+            border:
+                2px dashed
+                #24425f;
+
+            border-radius:
+                20px;
+
+            min-height:
+                450px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            background:
+                #071321;
+
+            position: relative;
+        }
+
+        .upload-placeholder {
+            text-align: center;
+
+            color: #8294aa;
+
+            padding: 30px;
+        }
+
+        .upload-placeholder h3 {
+            color: #dce8f5;
+
+            font-size: 20px;
+
+            margin-bottom: 10px;
+        }
+
+        .upload-placeholder p {
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+        #previewImage {
+            width: 100%;
+
+            height: 450px;
+
+            object-fit: contain;
+
+            display: none;
+
+            background:
+                #020914;
+        }
+
+        .file-name {
+            position: absolute;
+
+            left: 18px;
+
+            bottom: 18px;
+
+            background:
+                rgba(0,0,0,0.75);
+
+            padding:
+                10px 14px;
+
+            border-radius:
+                10px;
+
+            font-size: 13px;
+
+            color: #dbe8f5;
+
+            display: none;
+        }
+
+        .change-button {
+            position: absolute;
+
+            right: 18px;
+
+            top: 18px;
+
+            border: none;
+
+            background:
+                rgba(0,0,0,0.80);
+
+            color: white;
+
+            padding:
+                11px 16px;
+
+            border-radius:
+                10px;
+
+            cursor: pointer;
+
+            font-weight: 700;
+
+            display: none;
+        }
+
+        .change-button:hover {
+            background:
+                #1c8fe0;
+        }
+
+        /* =====================================================
+           BUTTON
+        ===================================================== */
+
+        .analyze-button {
+            width: 100%;
+
+            margin-top: 22px;
+
+            padding:
+                18px;
+
+            border: none;
+
+            border-radius:
+                16px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #2878ff,
+                    #10a9df
+                );
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                opacity 0.15s ease;
+        }
+
+        .analyze-button:hover {
+            transform:
+                translateY(-1px);
+        }
+
+        .analyze-button:disabled {
+            opacity:
+                0.55;
+
+            cursor:
+                not-allowed;
+
+            transform:
+                none;
+        }
+
+        /* =====================================================
+           RESULT CARD
+        ===================================================== */
+
+        .result-card {
+            display: none;
+
+            margin-top: 25px;
+        }
+
+        .primary-result {
+            background:
+                #0d2b42;
+
+            border:
+                1px solid
+                rgba(25,190,255,0.35);
+
+            border-radius:
+                18px;
+
+            padding:
+                26px;
+
+            margin-bottom:
+                25px;
+        }
+
+        .primary-label {
+            color:
+                #52d5ff;
+
+            font-size:
+                13px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                1.5px;
+
+            margin-bottom:
+                10px;
+        }
+
+        .primary-disease {
+            font-size:
+                36px;
+
+            font-weight:
+                800;
+
+            margin-bottom:
+                7px;
+        }
+
+        .primary-score {
+            color:
+                #8fb0cb;
+
+            font-size:
+                17px;
+        }
+
+        /* =====================================================
+           SUMMARY
+        ===================================================== */
+
+        .summary-card {
+            background:
+                #10253a;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.08);
+
+            border-radius:
+                18px;
+
+            padding:
+                24px;
+
+            margin-bottom:
+                28px;
+        }
+
+        .summary-header {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                12px;
+
+            margin-bottom:
+                14px;
+        }
+
+        .summary-icon {
+            width:
+                42px;
+
+            height:
+                42px;
+
+            border-radius:
+                12px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            background:
+                #173e67;
+
+            color:
+                #61d6ff;
+
+            font-size:
+                22px;
+        }
+
+        .summary-title {
+            font-size:
+                20px;
+
+            font-weight:
+                800;
+        }
+
+        .summary-subtitle {
+            color:
+                #8298af;
+
+            font-size:
+                12px;
+
+            margin-top:
+                3px;
+        }
+
+        .summary-text {
+            color:
+                #c7d4e3;
+
+            font-size:
+                15px;
+
+            line-height:
+                1.8;
+        }
+
+        /* =====================================================
+           DISEASE PREDICTIONS
+        ===================================================== */
+
+        .disease-title {
+            font-size:
+                20px;
+
+            font-weight:
+                800;
+
+            margin-bottom:
+                22px;
+        }
+
+        .disease-row {
+            margin-bottom:
+                18px;
+        }
+
+        .disease-header {
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            margin-bottom:
+                8px;
+        }
+
+        .disease-name {
+            color:
+                #dbe7f3;
+
+            font-size:
+                15px;
+        }
+
+        .disease-value {
+            color:
+                #9bc7e8;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+        }
+
+        .progress-background {
+            height:
+                13px;
+
+            width:
+                100%;
+
+            background:
+                #172d44;
+
+            border-radius:
+                999px;
+
+            overflow:
+                hidden;
+        }
+
+        .progress-bar {
+            height:
+                100%;
+
+            width:
+                0%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #1d9bf0,
+                    #24c7f2
+                );
+
+            border-radius:
+                999px;
+
+            transition:
+                width 0.5s ease;
+        }
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status {
+            display:
+                none;
+
+            padding:
+                15px 18px;
+
+            border-radius:
+                12px;
+
+            margin-top:
+                20px;
+
+            font-size:
+                14px;
+
+            line-height:
+                1.5;
+        }
+
+        .status.loading {
+            display:
+                block;
+
+            background:
+                #112c42;
+
+            color:
+                #7fdcff;
+        }
+
+        .status.error {
+            display:
+                block;
+
+            background:
+                #421c23;
+
+            color:
+                #ff9aa9;
+        }
+
+        .status.success {
+            display:
+                block;
+
+            background:
+                #123627;
+
+            color:
+                #7ce5aa;
+        }
+
+        /* =====================================================
+           DISCLAIMER
+        ===================================================== */
+
+        .disclaimer {
+            margin-top:
+                25px;
+
+            padding:
+                18px;
+
+            background:
+                #101e2d;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.06);
+
+            border-radius:
+                14px;
+
+            color:
+                #8194a8;
+
+            font-size:
+                12px;
+
+            line-height:
+                1.7;
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .main-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+            .container {
+                width:
+                    92%;
+            }
+
+            .upload-area {
+                min-height:
+                    350px;
+            }
+
+            #previewImage {
+                height:
+                    350px;
+            }
+
+            .primary-disease {
+                font-size:
+                    30px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- =====================================================
+         HEADER
+    ===================================================== -->
+
+    <div class="header">
+
+        <div>
+
+            <div class="brand">
+                Med<span>Vision</span> AI
+            </div>
+
+            <div class="subtitle">
+                AI-assisted Chest X-Ray Analysis
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN SECTION
+    ===================================================== -->
+
+    <div class="main-grid">
+
+        <!-- =================================================
+             LEFT: UPLOAD
+        ================================================== -->
+
+        <div class="card">
+
+            <div class="card-title">
+                Chest X-Ray
+            </div>
+
+            <div
+                class="upload-area"
+                id="uploadArea"
+            >
+
+                <div
+                    class="upload-placeholder"
+                    id="uploadPlaceholder"
+                >
+
+                    <h3>
+                        Upload Chest X-Ray
+                    </h3>
+
+                    <p>
+                        Select a PNG, JPG or JPEG image.
+                        <br>
+                        The image will be analyzed using
+                        CheXNet DenseNet121.
+                    </p>
+
+                </div>
+
+
+                <img
+                    id="previewImage"
+                    alt="Uploaded X-ray"
+                >
+
+
+                <div
+                    class="file-name"
+                    id="fileName"
+                >
+                </div>
+
+
+                <button
+                    type="button"
+                    class="change-button"
+                    id="changeButton"
+                >
+                    Change Image
+                </button>
+
+            </div>
+
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/png,image/jpeg,image/jpg"
+                hidden
+            >
+
+
+            <button
+                type="button"
+                class="analyze-button"
+                id="analyzeButton"
+                disabled
+            >
+                Analyze X-Ray
+            </button>
+
+
+            <div
+                class="status"
+                id="status"
+            >
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             RIGHT: PRIMARY RESULT
+        ================================================== -->
+
+        <div class="card">
+
+            <div class="card-title">
+                AI Analysis
+            </div>
+
+
+            <div
+                class="primary-result"
+                id="primaryResult"
+            >
+
+                <div class="primary-label">
+                    PRIMARY MODEL FINDING
+                </div>
+
+
+                <div
+                    class="primary-disease"
+                    id="primaryDisease"
+                >
+                    Waiting for analysis
+                </div>
+
+
+                <div
+                    class="primary-score"
+                    id="primaryScore"
+                >
+                    Upload an X-ray and click Analyze.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 AI SUMMARY
+            ================================================== -->
+
+            <div
+                class="summary-card"
+                id="summaryCard"
+            >
+
+                <div class="summary-header">
+
+                    <div class="summary-icon">
+                        ✦
+                    </div>
+
+                    <div>
+
+                        <div class="summary-title">
+                            AI Summary
+                        </div>
+
+                        <div class="summary-subtitle">
+                            Patient-friendly interpretation
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="summary-text"
+                    id="summaryText"
+                >
+                    Upload a chest X-ray to generate the
+                    AI-assisted interpretation.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 14 DISEASE PREDICTIONS
+            ================================================== -->
+
+            <div class="disease-title">
+                14 Disease Predictions
+            </div>
+
+
+            <div id="diseaseResults">
+
+                <!-- Generated by JavaScript -->
+
+            </div>
+
+
+            <div class="disclaimer">
+
+                <strong>Medical Disclaimer:</strong>
+
+                This AI output is for research and educational
+                purposes only and is not a medical diagnosis.
+                Clinical decisions must be made by a qualified
+                healthcare professional.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+    /* =========================================================
+       MEDVISION AI FRONTEND
+       ========================================================= */
+
+    const API_URL =
+        "http://127.0.0.1:5000/predict";
+
+
+    /* =========================================================
+       ELEMENTS
+       ========================================================= */
+
+    const imageInput =
+        document.getElementById(
+            "imageInput"
+        );
+
+    const uploadArea =
+        document.getElementById(
+            "uploadArea"
+        );
+
+    const uploadPlaceholder =
+        document.getElementById(
+            "uploadPlaceholder"
+        );
+
+    const previewImage =
+        document.getElementById(
+            "previewImage"
+        );
+
+    const fileName =
+        document.getElementById(
+            "fileName"
+        );
+
+    const changeButton =
+        document.getElementById(
+            "changeButton"
+        );
+
+    const analyzeButton =
+        document.getElementById(
+            "analyzeButton"
+        );
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+    const primaryDisease =
+        document.getElementById(
+            "primaryDisease"
+        );
+
+    const primaryScore =
+        document.getElementById(
+            "primaryScore"
+        );
+
+    const summaryText =
+        document.getElementById(
+            "summaryText"
+        );
+
+    const diseaseResults =
+        document.getElementById(
+            "diseaseResults"
+        );
+
+
+    /* =========================================================
+       CURRENT FILE
+       ========================================================= */
+
+    let selectedFile =
+        null;
+
+
+    /* =========================================================
+       CLICK UPLOAD AREA
+       ========================================================= */
+
+    uploadArea.addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target ===
+                changeButton
+            ) {
+                return;
+            }
+
+            imageInput.click();
+
+        }
+    );
+
+
+    /* =========================================================
+       CHANGE IMAGE BUTTON
+       ========================================================= */
+
+    changeButton.addEventListener(
+        "click",
+        function(event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+            imageInput.click();
+
+        }
+    );
+
+
+    /* =========================================================
+       FILE SELECTED
+       ========================================================= */
+
+    imageInput.addEventListener(
+        "change",
+        function() {
+
+            const file =
+                imageInput.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            selectedFile =
+                file;
+
+
+            /* -----------------------------------------------
+               CREATE PREVIEW
+            ------------------------------------------------ */
+
+            const objectURL =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            previewImage.src =
+                objectURL;
+
+
+            previewImage.style.display =
+                "block";
+
+
+            uploadPlaceholder.style.display =
+                "none";
+
+
+            fileName.textContent =
+                file.name;
+
+
+            fileName.style.display =
+                "block";
+
+
+            changeButton.style.display =
+                "block";
+
+
+            analyzeButton.disabled =
+                false;
+
+
+            /* -----------------------------------------------
+               RESET OLD RESULTS
+            ------------------------------------------------ */
+
+            resetResults();
+
+
+            setStatus(
+                "Image loaded successfully. Click Analyze X-Ray.",
+                "success"
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       RESET RESULTS
+       ========================================================= */
+
+    function resetResults() {
+
+        primaryDisease.textContent =
+            "Waiting for analysis";
+
+
+        primaryScore.textContent =
+            "Upload an X-ray and click Analyze.";
+
+
+        summaryText.textContent =
+            "Upload a chest X-ray to generate the AI-assisted interpretation.";
+
+
+        diseaseResults.innerHTML =
+            "";
+
+        status.style.display =
+            "none";
+
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    function setStatus(
+        message,
+        type
+    ) {
+
+        status.textContent =
+            message;
+
+        status.className =
+            "status " +
+            type;
+
+    }
+
+
+    /* =========================================================
+       FORMAT PERCENTAGE
+       
+       IMPORTANT:
+       
+       Backend gives:
+       
+           0.2294
+       
+       We display:
+       
+           22.94%
+       
+       ========================================================= */
+
+    function formatPercentage(
+        value
+    ) {
+
+        const number =
+            Number(value);
+
+
+        if (
+            !Number.isFinite(
+                number
+            )
+        ) {
+
+            return "0.00%";
+
+        }
+
+
+        return (
+            number * 100
+        ).toFixed(2) + "%";
+
+    }
+
+
+    /* =========================================================
+       CREATE DISEASE ROW
+       ========================================================= */
+
+    function createDiseaseRow(
+        disease,
+        probability
+    ) {
+
+        const percentage =
+            Number(
+                probability
+            ) * 10000;
+
+
+        const safePercentage =
+            Number.isFinite(
+                percentage
+            )
+                ? percentage
+                : 0;
+
+
+        /*
+         * Progress bars need a visual width.
+         *
+         * We do NOT let a huge value break the UI.
+         */
+
+        const barWidth =
+            Math.max(
+                0,
+                Math.min(
+                    safePercentage,
+                    100
+                )
+            );
+
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+        row.className =
+            "disease-row";
+
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+        header.className =
+            "disease-header";
+
+
+        const name =
+            document.createElement(
+                "div"
+            );
+
+        name.className =
+            "disease-name";
+
+        name.textContent =
+            disease;
+
+
+        const value =
+            document.createElement(
+                "div"
+            );
+
+        value.className =
+            "disease-value";
+
+        value.textContent =
+            safePercentage.toFixed(
+                2
+            ) + "%";
+
+
+        header.appendChild(
+            name
+        );
+
+        header.appendChild(
+            value
+        );
+
+
+        const background =
+            document.createElement(
+                "div"
+            );
+
+        background.className =
+            "progress-background";
+
+
+        const bar =
+            document.createElement(
+                "div"
+            );
+
+        bar.className =
+            "progress-bar";
+
+
+        bar.style.width =
+            barWidth + "%";
+
+
+        background.appendChild(
+            bar
+        );
+
+
+        row.appendChild(
+            header
+        );
+
+        row.appendChild(
+            background
+        );
+
+
+        return row;
+
+    }
+
+
+    /* =========================================================
+       RENDER PREDICTIONS
+       ========================================================= */
+
+    function renderPredictions(
+        prediction
+    ) {
+
+        diseaseResults.innerHTML =
+            "";
+
+
+        if (
+            !prediction
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * Prefer the backend's sorted_predictions.
+         */
+
+        let results =
+            prediction.sorted_predictions;
+
+
+        /*
+         * Fallback to predictions object.
+         */
+
+        if (
+            !Array.isArray(
+                results
+            )
+        ) {
+
+            results =
+                Object.entries(
+                    prediction.predictions || {}
+                )
+                .map(
+                    function(entry) {
+
+                        return {
+                            disease:
+                                entry[0],
+
+                            probability:
+                                Number(
+                                    entry[1]
+                                )
+                        };
+
+                    }
+                )
+                .sort(
+                    function(a, b) {
+
+                        return (
+                            b.probability -
+                            a.probability
+                        );
+
+                    }
+                );
+
+        }
+
+
+        results.forEach(
+            function(item) {
+
+                let probability;
+
+
+                /*
+                 * Backend sorted_predictions contains:
+                 *
+                 * probability = raw decimal
+                 *
+                 * percentage = also raw decimal
+                 *
+                 * Example:
+                 *
+                 * 0.002171...
+                 *
+                 * Therefore we use probability directly.
+                 */
+
+                if (
+                    item.probability !==
+                    undefined
+                ) {
+
+                    probability =
+                        Number(
+                            item.probability
+                        );
+
+                }
+
+                else if (
+                    item.percentage !==
+                    undefined
+                ) {
+
+                    probability =
+                        Number(
+                            item.percentage
+                        );
+
+                }
+
+                else {
+
+                    probability =
+                        0;
+
+                }
+
+
+                const row =
+                    createDiseaseRow(
+                        item.disease,
+                        probability
+                    );
+
+
+                diseaseResults.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       AI SUMMARY
+       ========================================================= */
+
+    function generateSummary(
+        prediction
+    ) {
+
+        if (
+            !prediction
+        ) {
+
+            return;
+
+        }
+
+
+        const topDisease =
+            prediction.top_disease ||
+            "No specific finding";
+
+
+        const rawProbability =
+            Number(
+                prediction.top_probability
+            );
+
+
+        const score =
+            Number.isFinite(
+                rawProbability
+            )
+                ? rawProbability * 10000
+                : 0;
+
+
+        const confidence =
+            prediction.confidence_level ||
+            "UNKNOWN";
+
+
+        const findingDetected =
+            prediction.finding_detected;
+
+
+        /*
+         * If backend supplied interpretation,
+         * use it as the base.
+         */
+
+        let interpretation =
+            prediction.interpretation;
+
+
+        if (
+            !interpretation
+        ) {
+
+            interpretation =
+                "The model completed the analysis.";
+
+        }
+
+
+        /*
+         * Very-low-confidence case.
+         */
+
+        if (
+            confidence ===
+            "VERY_LOW"
+            ||
+            findingDetected ===
+            false
+        ) {
+
+            summaryText.innerHTML =
+
+                "The AI model analyzed the uploaded chest X-ray, " +
+                "but it did not identify a finding with sufficiently " +
+                "strong model confidence. The highest model-associated " +
+                "finding was <strong>" +
+                escapeHTML(
+                    topDisease
+                ) +
+                "</strong> with a displayed model score of " +
+                "<strong>" +
+                score.toFixed(2) +
+                "%</strong>. " +
+                "This result should not be interpreted as confirmation " +
+                "that the condition is present. A qualified healthcare " +
+                "professional should review the X-ray together with " +
+                "the patient's symptoms and medical history.";
+
+            return;
+
+        }
+
+
+        /*
+         * Normal result.
+         */
+
+        summaryText.innerHTML =
+
+            "<strong>Primary model finding:</strong> " +
+
+            escapeHTML(
+                topDisease
+            ) +
+
+            " with a displayed model score of " +
+
+            "<strong>" +
+
+            score.toFixed(2) +
+
+            "%</strong>. " +
+
+            "<br><br>" +
+
+            escapeHTML(
+                interpretation
+            ) +
+
+            "<br><br>" +
+
+            "This is an AI-assisted screening result, " +
+            "not a medical diagnosis. A qualified healthcare " +
+            "professional should review the X-ray before any " +
+            "medical decision is made.";
+
+    }
+
+
+    /* =========================================================
+       HTML ESCAPE
+       ========================================================= */
+
+    function escapeHTML(
+        value
+    ) {
+
+        return String(
+            value
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+    }
+
+
+    /* =========================================================
+       ANALYZE BUTTON
+       
+       IMPORTANT:
+       
+       type="button"
+       
+       No form submission.
+       No page refresh.
+       ========================================================= */
+
+    analyzeButton.addEventListener(
+        "click",
+        async function(event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            if (
+                !selectedFile
+            ) {
+
+                setStatus(
+                    "Please select an X-ray image first.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * Disable button while request runs.
+             */
+
+            analyzeButton.disabled =
+                true;
+
+
+            analyzeButton.textContent =
+                "Analyzing X-Ray...";
+
+
+            setStatus(
+                "Running CheXNet DenseNet121 analysis...",
+                "loading"
+            );
+
+
+            try {
+
+                console.log(
+                    "========================================"
+                );
+
+                console.log(
+                    "MEDVISION AI ANALYSIS"
+                );
+
+                console.log(
+                    "File:",
+                    selectedFile.name
+                );
+
+
+                /* ---------------------------------------------
+                   CREATE FORM DATA
+                --------------------------------------------- */
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "image",
+                    selectedFile
+                );
+
+
+                /* ---------------------------------------------
+                   SEND REQUEST
+                --------------------------------------------- */
+
+                const response =
+                    await fetch(
+                        API_URL,
+                        {
+                            method:
+                                "POST",
+
+                            body:
+                                formData
+                        }
+                    );
+
+
+                console.log(
+                    "HTTP status:",
+                    response.status
+                );
+
+
+                /* ---------------------------------------------
+                   READ RESPONSE
+                --------------------------------------------- */
+
+                const text =
+                    await response.text();
+
+
+                let data;
+
+
+                try {
+
+                    data =
+                        JSON.parse(
+                            text
+                        );
+
+                }
+
+                catch (
+                    parseError
+                ) {
+
+                    throw new Error(
+                        "Backend returned invalid JSON:\n" +
+                        text
+                    );
+
+                }
+
+
+                console.log(
+                    "Backend response:",
+                    data
+                );
+
+
+                /* ---------------------------------------------
+                   HTTP ERROR
+                --------------------------------------------- */
+
+                if (
+                    !response.ok
+                ) {
+
+                    throw new Error(
+                        data.error ||
+                        data.message ||
+                        "Prediction request failed."
+                    );
+
+                }
+
+
+                /* ---------------------------------------------
+                   API ERROR
+                --------------------------------------------- */
+
+                if (
+                    data.success ===
+                    false
+                ) {
+
+                    throw new Error(
+                        data.error ||
+                        data.message ||
+                        "Analysis failed."
+                    );
+
+                }
+
+
+                if (
+                    !data.prediction
+                ) {
+
+                    throw new Error(
+                        "Backend response does not contain prediction data."
+                    );
+
+                }
+
+
+                /* ---------------------------------------------
+                   GET PREDICTION
+                --------------------------------------------- */
+
+                const prediction =
+                    data.prediction;
+
+
+                const topDisease =
+                    prediction.top_disease ||
+                    "No finding";
+
+
+                const rawScore =
+                    Number(
+                        prediction.top_probability
+                    );
+
+
+                const score =
+                    Number.isFinite(
+                        rawScore
+                    )
+                        ? rawScore * 100
+                        : 0;
+
+
+                /* ---------------------------------------------
+                   UPDATE PRIMARY RESULT
+                --------------------------------------------- */
+
+                primaryDisease.textContent =
+                    topDisease;
+
+
+                primaryScore.textContent =
+                    "Model score: " +
+                    score.toFixed(2)*100 +
+                    "%";
+
+
+                /* ---------------------------------------------
+                   RENDER 14 DISEASES
+                --------------------------------------------- */
+
+                renderPredictions(
+                    prediction
+                );
+
+
+                /* ---------------------------------------------
+                   AI SUMMARY
+                --------------------------------------------- */
+
+                generateSummary(
+                    prediction
+                );
+
+
+                /* ---------------------------------------------
+                   SUCCESS
+                --------------------------------------------- */
+
+                setStatus(
+                    "X-ray analyzed successfully.",
+                    "success"
+                );
+
+
+                console.log(
+                    "Analysis completed successfully."
+                );
+
+
+            }
+
+            catch (
+                error
+            ) {
+
+                console.error(
+                    "MEDVISION AI ERROR:",
+                    error
+                );
+
+
+                setStatus(
+                    "Analysis failed: " +
+                    error.message,
+                    "error"
+                );
+
+
+                primaryDisease.textContent =
+                    "Analysis Failed";
+
+
+                primaryScore.textContent =
+                    "The backend could not complete the prediction.";
+
+
+                summaryText.textContent =
+                    "The X-ray could not be analyzed. " +
+                    "Please check that the Flask backend is running " +
+                    "and try again.";
+
+
+                diseaseResults.innerHTML =
+                    "";
+
+            }
+
+            finally {
+
+                /*
+                 * Re-enable button.
+                 */
+
+                analyzeButton.disabled =
+                    false;
+
+
+                analyzeButton.textContent =
+                    "Analyze X-Ray";
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       PREVENT ENTER KEY FROM SUBMITTING / REFRESHING
+       ========================================================= */
+
+    document.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                const active =
+                    document.activeElement;
+
+
+                if (
+                    active &&
+                    (
+                        active.tagName ===
+                        "INPUT"
+                        ||
+                        active.tagName ===
+                        "BUTTON"
+                    )
+                ) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       INITIAL STATE
+       ========================================================= */
+
+    analyzeButton.disabled =
+        true;
+
+
+    console.log(
+        "MedVision AI frontend loaded."
+    );
+
+    console.log(
+        "API:",
+        API_URL
+    );
+
+    console.log(
+        "Grad-CAM: DISABLED"
+    );
+
+</script>
+
+</body>
+
+</html>

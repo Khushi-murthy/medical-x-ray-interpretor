@@ -1,0 +1,1319 @@
+/* ==========================================================
+   AI MEDICAL X-RAY INTERPRETER
+   PREMIUM UI
+   PART 1
+========================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --primary:#2F80ED;
+    --secondary:#56CCF2;
+    --success:#27AE60;
+    --danger:#EB5757;
+    --glass:rgba(255,255,255,0.18);
+    --glass2:rgba(255,255,255,0.08);
+    --text:#ffffff;
+    --dark:#0b132b;
+    --card:#12203a;
+    --shadow:0 20px 40px rgba(0,0,0,.25);
+
+}
+
+body{
+
+    font-family:'Poppins',sans-serif;
+
+    min-height:100vh;
+
+    color:var(--text);
+
+    background:linear-gradient(
+    135deg,
+    #081120,
+    #102542,
+    #163A5F,
+    #1F4E79);
+
+    overflow-x:hidden;
+
+}
+
+/* Animated Background */
+
+.background-blur{
+
+    position:fixed;
+
+    width:100%;
+
+    height:100%;
+
+    z-index:-2;
+
+    overflow:hidden;
+
+}
+
+/* Blob 1 */
+
+.background-blur::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:450px;
+
+    height:450px;
+
+    border-radius:50%;
+
+    background:#2F80ED;
+
+    filter:blur(130px);
+
+    opacity:.30;
+
+    left:-120px;
+
+    top:-100px;
+
+    animation:float1 18s infinite alternate;
+
+}
+
+/* Blob 2 */
+
+.background-blur::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:500px;
+
+    height:500px;
+
+    border-radius:50%;
+
+    background:#56CCF2;
+
+    filter:blur(150px);
+
+    opacity:.25;
+
+    right:-150px;
+
+    bottom:-120px;
+
+    animation:float2 22s infinite alternate;
+
+}
+
+/* Glass Navbar */
+
+.glass-nav{
+
+    background:rgba(255,255,255,.08);
+
+    backdrop-filter:blur(20px);
+
+    border-bottom:1px solid rgba(255,255,255,.12);
+
+    box-shadow:var(--shadow);
+
+}
+
+.navbar-brand{
+
+    color:white !important;
+
+    font-size:28px;
+
+    letter-spacing:1px;
+
+}
+
+.theme-btn{
+
+    width:45px;
+
+    height:45px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.15);
+
+    color:white;
+
+    transition:.4s;
+
+}
+
+.theme-btn:hover{
+
+    transform:rotate(180deg);
+
+    background:#2F80ED;
+
+}
+
+/* Hero */
+
+.hero-image{
+
+    width:330px;
+
+    animation:floating 5s ease-in-out infinite;
+
+}
+
+.display-4{
+
+    font-weight:700;
+
+    color:white;
+
+}
+
+.lead{
+
+    color:#d8e9ff;
+
+    line-height:1.8;
+
+}
+
+/* Glass Cards */
+
+.glass-card{
+
+    background:rgba(255,255,255,.10);
+
+    border:1px solid rgba(255,255,255,.15);
+
+    backdrop-filter:blur(25px);
+
+    border-radius:24px;
+
+    box-shadow:var(--shadow);
+
+    transition:.35s;
+
+}
+
+.glass-card:hover{
+
+    transform:translateY(-8px);
+
+}
+
+/* Upload Box */
+
+.upload-box{
+
+    border:3px dashed rgba(255,255,255,.25);
+
+    border-radius:20px;
+
+    text-align:center;
+
+    padding:70px;
+
+    transition:.35s;
+
+    cursor:pointer;
+
+}
+
+.upload-box:hover{
+
+    border-color:#56CCF2;
+
+    background:rgba(255,255,255,.05);
+
+}
+
+.upload-icon{
+
+    font-size:75px;
+
+    margin-bottom:20px;
+
+    color:#56CCF2;
+
+}
+
+/* Preview */
+
+.preview-image{
+
+    width:320px;
+
+    border-radius:20px;
+
+    box-shadow:0 20px 40px rgba(0,0,0,.4);
+
+    transition:.35s;
+
+}
+
+.preview-image:hover{
+
+    transform:scale(1.03);
+
+}
+
+/* Buttons */
+
+.btn{
+
+    border-radius:50px !important;
+
+    font-weight:600;
+
+    letter-spacing:.5px;
+
+}
+
+.btn-success{
+
+    background:linear-gradient(
+    135deg,
+    #27AE60,
+    #6FCF97);
+
+    border:none;
+
+}
+
+.btn-success:hover{
+
+    transform:translateY(-4px);
+
+}
+
+.btn-primary{
+
+    background:linear-gradient(
+    135deg,
+    #2F80ED,
+    #56CCF2);
+
+    border:none;
+
+}
+
+.btn-primary:hover{
+
+    transform:translateY(-4px);
+
+}
+
+/* Prediction */
+
+#predictionCard h2{
+
+    margin-bottom:25px;
+
+}
+
+/* Report */
+
+#report{
+
+    line-height:2;
+
+    font-size:17px;
+
+    color:white;
+
+}
+
+/* Spinner */
+
+.spinner-border{
+
+    animation:spin 1s linear infinite;
+
+}
+
+/* Chart */
+
+canvas{
+
+    margin-top:20px;
+
+}
+
+/* Section */
+
+section{
+
+    margin-bottom:70px;
+
+}
+
+/* Headings */
+
+h2{
+
+    font-weight:700;
+
+    margin-bottom:20px;
+
+}
+
+/* Paragraph */
+
+p{
+
+    color:#eef5ff;
+
+}
+
+/* ==========================================================
+   AI MEDICAL X-RAY INTERPRETER
+   PREMIUM UI
+   PART 2
+========================================================== */
+
+/* ===========================
+   Prediction Cards
+=========================== */
+
+.prediction-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+    gap:25px;
+
+    margin-top:30px;
+
+}
+
+.prediction-card{
+
+    background:rgba(255,255,255,.08);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:20px;
+
+    padding:22px;
+
+    transition:.35s;
+
+    border:1px solid rgba(255,255,255,.10);
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+.prediction-card:hover{
+
+    transform:translateY(-8px) scale(1.03);
+
+    box-shadow:0 25px 40px rgba(0,0,0,.35);
+
+}
+
+.prediction-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:140px;
+
+    height:140px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.05);
+
+    right:-40px;
+
+    top:-40px;
+
+}
+
+/* ===========================
+   Disease Name
+=========================== */
+
+.disease-title{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:white;
+
+    margin-bottom:12px;
+
+}
+
+/* ===========================
+   Percentage
+=========================== */
+
+.percent{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    color:#56CCF2;
+
+}
+
+/* ===========================
+   Progress Bar
+=========================== */
+
+.progress{
+
+    height:12px;
+
+    margin-top:18px;
+
+    border-radius:50px;
+
+    overflow:hidden;
+
+    background:rgba(255,255,255,.12);
+
+}
+
+.progress-bar{
+
+    background:linear-gradient(
+    90deg,
+    #2F80ED,
+    #56CCF2);
+
+    border-radius:50px;
+
+}
+
+/* ===========================
+   Top Prediction Card
+=========================== */
+
+.top-card{
+
+    background:linear-gradient(
+    135deg,
+    #2F80ED,
+    #56CCF2);
+
+    color:white;
+
+    border-radius:25px;
+
+    padding:35px;
+
+    box-shadow:0 30px 45px rgba(0,0,0,.35);
+
+    margin-bottom:35px;
+
+}
+
+.top-card h2{
+
+    font-size:36px;
+
+}
+
+.top-card p{
+
+    font-size:18px;
+
+}
+
+/* ===========================
+   AI Report
+=========================== */
+
+.report-card{
+
+    background:rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    padding:35px;
+
+    line-height:2;
+
+    border-left:6px solid #56CCF2;
+
+}
+
+.report-card h3{
+
+    color:#56CCF2;
+
+    margin-bottom:20px;
+
+}
+
+.report-card ul{
+
+    margin-left:22px;
+
+}
+
+.report-card li{
+
+    margin-bottom:10px;
+
+}
+
+/* ===========================
+   Chat Section
+=========================== */
+
+.chat-container{
+
+    background:rgba(255,255,255,.08);
+
+    border-radius:25px;
+
+    padding:25px;
+
+}
+
+.chat-box{
+
+    height:320px;
+
+    overflow-y:auto;
+
+    background:rgba(255,255,255,.04);
+
+    border-radius:18px;
+
+    padding:18px;
+
+}
+
+.user-msg{
+
+    background:#2F80ED;
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:20px;
+
+    width:fit-content;
+
+    margin-left:auto;
+
+    margin-bottom:15px;
+
+}
+
+.ai-msg{
+
+    background:#1B3557;
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:20px;
+
+    width:fit-content;
+
+    margin-bottom:15px;
+
+}
+
+.chat-input{
+
+    margin-top:18px;
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+.chat-input input{
+
+    flex:1;
+
+    background:rgba(255,255,255,.08);
+
+    border:none;
+
+    color:white;
+
+    padding:15px;
+
+    border-radius:15px;
+
+}
+
+.chat-input input:focus{
+
+    outline:none;
+
+}
+
+/* ===========================
+   PDF Button
+=========================== */
+
+.download-btn{
+
+    background:linear-gradient(
+    135deg,
+    #27AE60,
+    #6FCF97);
+
+    color:white;
+
+    border:none;
+
+    padding:14px 28px;
+
+    border-radius:50px;
+
+    transition:.3s;
+
+}
+
+.download-btn:hover{
+
+    transform:translateY(-5px);
+
+}
+
+/* ===========================
+   GradCAM
+=========================== */
+
+.gradcam-container{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+
+    gap:30px;
+
+}
+
+.gradcam-image{
+
+    width:100%;
+
+    border-radius:20px;
+
+    transition:.35s;
+
+    box-shadow:0 20px 35px rgba(0,0,0,.30);
+
+}
+
+.gradcam-image:hover{
+
+    transform:scale(1.02);
+
+}
+
+/* ===========================
+   Confidence Meter
+=========================== */
+
+.confidence{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:20px;
+
+}
+
+.badge-high{
+
+    background:#27AE60;
+
+    padding:8px 18px;
+
+    border-radius:50px;
+
+}
+
+.badge-medium{
+
+    background:#F2C94C;
+
+    padding:8px 18px;
+
+    border-radius:50px;
+
+}
+
+.badge-low{
+
+    background:#EB5757;
+
+    padding:8px 18px;
+
+    border-radius:50px;
+
+}
+
+/* ===========================
+   Glass Inputs
+=========================== */
+
+input,
+textarea{
+
+    background:rgba(255,255,255,.08)!important;
+
+    color:white!important;
+
+    border:none!important;
+
+}
+
+input::placeholder{
+
+    color:#d7d7d7;
+
+}
+
+textarea::placeholder{
+
+    color:#d7d7d7;
+
+}
+
+/* ==========================================================
+   AI MEDICAL X-RAY INTERPRETER
+   PREMIUM UI
+   PART 3
+==========================================================*/
+
+/* Floating Animation */
+
+@keyframes floating{
+
+    0%{
+        transform:translateY(0px);
+    }
+
+    50%{
+        transform:translateY(-18px);
+    }
+
+    100%{
+        transform:translateY(0px);
+    }
+
+}
+
+/* Blob Animation */
+
+@keyframes float1{
+
+    from{
+
+        transform:translate(-60px,-40px);
+
+    }
+
+    to{
+
+        transform:translate(80px,60px);
+
+    }
+
+}
+
+@keyframes float2{
+
+    from{
+
+        transform:translate(60px,40px);
+
+    }
+
+    to{
+
+        transform:translate(-80px,-70px);
+
+    }
+
+}
+
+/* Fade Animation */
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(25px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+.fade-in{
+
+    animation:fadeIn .8s ease;
+
+}
+
+/* Glow */
+
+.glow{
+
+    box-shadow:
+
+    0 0 20px rgba(86,204,242,.4),
+
+    0 0 50px rgba(86,204,242,.2);
+
+}
+
+/* Hover Lift */
+
+.hover-lift{
+
+    transition:.35s;
+
+}
+
+.hover-lift:hover{
+
+    transform:translateY(-10px);
+
+}
+
+/* Glass Reflection */
+
+.glass-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-120%;
+
+    width:50%;
+
+    height:100%;
+
+    background:linear-gradient(
+
+        90deg,
+
+        transparent,
+
+        rgba(255,255,255,.25),
+
+        transparent
+
+    );
+
+    transform:skewX(-25deg);
+
+}
+
+.glass-card:hover::after{
+
+    left:170%;
+
+    transition:1.2s;
+
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#071321;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#2F80ED;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#56CCF2;
+
+}
+
+/* Selection */
+
+::selection{
+
+    background:#56CCF2;
+
+    color:white;
+
+}
+
+/* Smooth Scroll */
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+/* Footer */
+
+footer{
+
+    margin-top:70px;
+
+    text-align:center;
+
+    padding:30px;
+
+    color:#b8d4ff;
+
+}
+
+/* Notification */
+
+.toast-card{
+
+    position:fixed;
+
+    top:30px;
+
+    right:30px;
+
+    background:#2F80ED;
+
+    color:white;
+
+    padding:18px 24px;
+
+    border-radius:15px;
+
+    box-shadow:0 20px 35px rgba(0,0,0,.3);
+
+    display:none;
+
+    z-index:9999;
+
+}
+
+/* Image Hover */
+
+.preview-image{
+
+    cursor:pointer;
+
+}
+
+.preview-image:hover{
+
+    box-shadow:
+
+    0 20px 45px rgba(0,0,0,.4),
+
+    0 0 25px rgba(86,204,242,.35);
+
+}
+
+/* Upload Animation */
+
+.upload-box{
+
+    animation:fadeIn 1s ease;
+
+}
+
+.upload-box.dragover{
+
+    border-color:#56CCF2;
+
+    background:rgba(86,204,242,.15);
+
+    transform:scale(1.02);
+
+}
+
+/* Report Animation */
+
+#report{
+
+    animation:fadeIn 1s ease;
+
+}
+
+/* Prediction Animation */
+
+#predictionCard{
+
+    animation:fadeIn .8s ease;
+
+}
+
+/* Chart */
+
+#chart{
+
+    max-height:420px;
+
+}
+
+/* Dark Mode */
+
+.dark{
+
+    background:#050d18;
+
+}
+
+.dark .glass-card{
+
+    background:rgba(255,255,255,.06);
+
+}
+
+.dark .upload-box{
+
+    background:rgba(255,255,255,.03);
+
+}
+
+/* Responsive */
+
+@media(max-width:1200px){
+
+.hero-image{
+
+width:260px;
+
+}
+
+}
+
+@media(max-width:992px){
+
+.display-4{
+
+font-size:40px;
+
+}
+
+.hero-image{
+
+margin-top:40px;
+
+width:240px;
+
+}
+
+.glass-card{
+
+padding:25px;
+
+}
+
+.preview-image{
+
+width:280px;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.display-4{
+
+font-size:34px;
+
+text-align:center;
+
+}
+
+.lead{
+
+text-align:center;
+
+}
+
+.navbar-brand{
+
+font-size:22px;
+
+}
+
+.upload-box{
+
+padding:40px;
+
+}
+
+.preview-image{
+
+width:220px;
+
+}
+
+.top-card h2{
+
+font-size:28px;
+
+}
+
+.percent{
+
+font-size:28px;
+
+}
+
+}
+
+@media(max-width:576px){
+
+body{
+
+padding:10px;
+
+}
+
+.glass-card{
+
+border-radius:18px;
+
+}
+
+.preview-image{
+
+width:180px;
+
+}
+
+button{
+
+width:100%;
+
+}
+
+}
+
+/* Utility */
+
+.hidden{
+
+display:none;
+
+}
+
+.center{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+.mt-large{
+
+margin-top:80px;
+
+}
+
+.shadow-soft{
+
+box-shadow:0 15px 35px rgba(0,0,0,.25);
+
+}
+
+.round{
+
+border-radius:25px;
+
+}
+
+.text-blue{
+
+color:#56CCF2;
+
+}
+
+.text-green{
+
+color:#6FCF97;
+
+}
+
+.text-red{
+
+color:#EB5757;
+
+}
+
+.bg-glass{
+
+background:rgba(255,255,255,.08);
+
+backdrop-filter:blur(20px);
+
+}
+
+.transition{
+
+transition:.35s ease;
+
+}
+
+/* ==========================================================
+   END OF CSS
+==========================================================*/
