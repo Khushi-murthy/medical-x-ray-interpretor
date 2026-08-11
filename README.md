@@ -44,7 +44,7 @@ The project combines multiple AI components rather than treating image classific
 
 ---
 
-# 🎯 Problem Statement
+#  Problem Statement
 
 Medical X-ray images contain complex visual information and may require significant expertise and time for interpretation.
 
@@ -62,7 +62,7 @@ The system demonstrates how **Computer Vision + Explainable AI + NLP/Generative 
 
 ---
 
-# 🚀 Objectives
+# Objectives
 
 The project focuses on the following objectives:
 
@@ -96,7 +96,7 @@ Build a complete pipeline from image upload to prediction, explanation, and repo
 
 ---
 
-# ✨ Key Features
+#  Key Features
 
 * 🩻 X-ray image upload and processing
 * 🧹 Automated image preprocessing
@@ -115,7 +115,7 @@ Build a complete pipeline from image upload to prediction, explanation, and repo
 
 ---
 
-# 🏗️ System Architecture
+#  System Architecture
 
 ```text
                          ┌───────────────────┐
@@ -174,7 +174,7 @@ Build a complete pipeline from image upload to prediction, explanation, and repo
 
 ---
 
-# 🔄 End-to-End Workflow
+#  End-to-End Workflow
 
 ## Step 1 — X-Ray Image Input
 
@@ -240,7 +240,7 @@ The same preprocessing strategy should be used consistently during training and 
 
 ---
 
-# 🧹 Data Preprocessing
+# Data Preprocessing
 
 The preprocessing stage prepares the dataset for deep learning.
 
@@ -271,7 +271,7 @@ notebooks/
 
 ---
 
-# 🧠 CNN-Based X-Ray Classification
+#  CNN-Based X-Ray Classification
 
 The primary Computer Vision component uses a **Convolutional Neural Network (CNN)** to learn visual patterns from X-ray images.
 
@@ -322,7 +322,7 @@ Thresholding can then be applied to determine the final predicted findings.
 
 ---
 
-# 🔎 Explainable AI with Grad-CAM
+#  Explainable AI with Grad-CAM
 
 A prediction alone does not explain **why** the model made that prediction.
 
@@ -365,7 +365,7 @@ cnn/gradcam.py
 
 ---
 
-# 📝 NLP / Generative AI Report Generation
+#  NLP / Generative AI Report Generation
 
 The NLP component converts structured model outputs into a readable report.
 
@@ -409,7 +409,7 @@ The generated report is intended to improve the readability and accessibility of
 
 ---
 
-# ⚙️ Backend
+#  Backend
 
 The backend provides the communication layer between the frontend and AI components.
 
@@ -433,7 +433,7 @@ backend/
 
 ---
 
-# 🌐 Frontend
+#  Frontend
 
 The frontend provides the user-facing interface.
 
@@ -457,7 +457,7 @@ static/
 
 ---
 
-# 📁 Project Structure
+#  Project Structure
 
 ```text
 Medical-Xray-Interpreter/
@@ -541,7 +541,7 @@ Medical-Xray-Interpreter/
 
 ---
 
-# 📊 Dataset
+#  Dataset
 
 The project uses a medical X-ray dataset for model development and evaluation.
 
@@ -564,7 +564,7 @@ The dataset directory is excluded from Git using `.gitignore`.
 
 ---
 
-# 📦 Installation
+# Installation
 
 ## 1. Clone the Repository
 
@@ -621,7 +621,7 @@ pip --version
 
 ---
 
-# 🔐 Configuration
+#  Configuration
 
 Sensitive credentials should never be committed to GitHub.
 
@@ -651,7 +651,7 @@ MODEL_PATH=your_model_path_here
 
 ---
 
-# 🏋️ Model Training
+#  Model Training
 
 The general training pipeline is:
 
@@ -703,7 +703,7 @@ python cnn/train.py
 
 ---
 
-# 📈 Model Evaluation
+#  Model Evaluation
 
 The model can be evaluated using standard classification metrics.
 
@@ -740,7 +740,7 @@ These files provide quantitative information about model performance.
 
 ---
 
-# 🔬 Prediction Pipeline
+#  Prediction Pipeline
 
 Once the model is trained, inference follows this workflow:
 
@@ -781,7 +781,7 @@ Once the model is trained, inference follows this workflow:
 
 ---
 
-# 📤 Output
+#  Output
 
 The system can generate three major categories of output.
 
@@ -804,7 +804,7 @@ A structured textual summary generated from the model's findings.
 
 ---
 
-# 🔌 Backend API Workflow
+#  Backend API Workflow
 
 The frontend communicates with the backend through an API.
 
@@ -849,7 +849,7 @@ The actual API fields depend on the current backend implementation.
 
 ---
 
-# 🧪 Testing
+#  Testing
 
 The repository contains testing utilities such as:
 
@@ -882,7 +882,7 @@ pytest
 
 ---
 
-# 📋 Reports and Results
+#  Reports and Results
 
 Project documentation and generated reports are maintained in:
 
@@ -906,7 +906,7 @@ These outputs can be used for project analysis, demonstrations, and academic eva
 
 ---
 
-# 🔒 Security & Privacy
+# Security & Privacy
 
 Medical imaging requires careful handling of sensitive information.
 
@@ -923,7 +923,7 @@ The following practices should be followed:
 
 ---
 
-# ⚠️ Limitations
+#  Limitations
 
 ### Dataset Dependency
 
@@ -947,7 +947,7 @@ This project is not presented as a clinically validated diagnostic device. Clini
 
 ---
 
-# 🚀 Future Enhancements
+# Future Enhancements
 
 Potential improvements include:
 
@@ -970,7 +970,7 @@ Potential improvements include:
 
 ---
 
-# 💡 Applications
+#  Applications
 
 The project provides a foundation for exploring:
 
@@ -989,7 +989,7 @@ It can also serve as an educational platform for understanding how multiple AI t
 
 ---
 
-# 📌 Project Status
+#  Project Status
 
 **Status: Active Development**
 
@@ -1008,15 +1008,16 @@ Further optimization, validation, testing, and deployment remain part of the dev
 
 ---
 
-# 👥 Contributors
+#  Contributors 
+Individual
 
 **Medical X-Ray Interpreter Project Team**
 
-Developed as an academic and research-oriented project focused on applying Artificial Intelligence and Machine Learning to medical image analysis.
+Developed as an  academic and research-oriented project focused on applying Artificial Intelligence and Machine Learning to medical image analysis.
 
 ---
 
-# 📜 Disclaimer
+#  Disclaimer
 
 This project is intended strictly for **educational, research, and demonstration purposes**.
 
@@ -1026,7 +1027,7 @@ All medical decisions should be made by qualified healthcare professionals using
 
 ---
 
-# ⭐ Acknowledgements
+# Acknowledgements
 
 We acknowledge the researchers, institutions, dataset providers, and open-source communities whose contributions support research and development in:
 
@@ -1039,7 +1040,7 @@ We acknowledge the researchers, institutions, dataset providers, and open-source
 
 ---
 
-## 🔗 Repository
+##  Repository
 
 **GitHub:**
 https://github.com/Khushi-murthy/medical-x-ray-interpretor
