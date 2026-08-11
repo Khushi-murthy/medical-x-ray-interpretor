@@ -4,7 +4,7 @@
 
 An end-to-end **Artificial Intelligence and Machine Learning system for X-ray image analysis**, combining **Deep Learning, Computer Vision, Explainable AI, Natural Language Processing, and Generative AI** into a unified application.
 
-The system accepts an X-ray image, preprocesses it, analyzes it using a CNN-based classification pipeline, generates visual explanations using **Grad-CAM**, and produces a structured natural-language report based on the model's findings.
+The system accepts an X-ray image, preprocesses it, analyzes it using a CNN-based classification pipeline, and produces a structured natural-language report based on the model's findings.
 
 > **Disclaimer:** This project is developed for educational, research, and demonstration purposes. It is not intended to replace professional medical diagnosis, clinical judgment, or advice from qualified healthcare professionals.
 
