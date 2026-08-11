@@ -28,9 +28,6 @@ CNN-Based Classification
      ├──────────────► Disease / Abnormality Predictions
      │
      ▼
-Grad-CAM Explainability
-     │
-     ▼
 NLP / Generative AI
      │
      ▼
