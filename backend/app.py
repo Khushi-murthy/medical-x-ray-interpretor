@@ -2,10 +2,11 @@ import os
 import uuid
 import traceback
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-
+from tempfile import NamedTemporaryFile
+from gemini_service import generate_xray_explanation
 
 # ============================================================
 # MEDVISION AI
@@ -62,6 +63,33 @@ def allowed_file(filename):
     return extension in ALLOWED_EXTENSIONS
 
 
+def find_disease_by_query(query):
+
+    if not query:
+        return None
+
+    normalized = query.strip().lower()
+
+    # direct exact lookup first
+    for disease in DISEASE_KNOWLEDGE:
+        if disease.lower() == normalized:
+            return disease
+
+    # try matching on word boundaries and text fragments
+    for disease in DISEASE_KNOWLEDGE:
+        if disease.replace("_", " ").lower() in normalized:
+            return disease
+
+    # try words in disease names
+    query_words = normalized.split()
+    for disease in DISEASE_KNOWLEDGE:
+        disease_words = disease.replace("_", " ").lower().split()
+        if any(word in disease_words for word in query_words):
+            return disease
+
+    return None
+
+
 # ============================================================
 # IMPORT PREDICTOR
 # ============================================================
@@ -78,6 +106,8 @@ try:
     print("✓ Predictor imported successfully")
     print("✓ Number of diseases:", len(DISEASES))
 
+    from disease_knowledge import DISEASE_KNOWLEDGE
+
 except Exception:
 
     print("\n❌ Predictor import failed")
@@ -89,7 +119,7 @@ except Exception:
 # OPTIONAL GRAD-CAM
 # ============================================================
 
-GRADCAM_AVAILABLE = False
+GRADCAM_AVAILABLE = True
 generate_gradcam = None
 
 try:
@@ -283,6 +313,22 @@ def predict():
             "threshold"
         )
 
+        # ====================================================
+        # AI EXPLANATION
+        # ====================================================
+
+        try:
+            ai_explanation = generate_xray_explanation(
+                predictions,
+                language="en"
+            )
+        except Exception as e:
+            print("Gemini error:", e)
+            ai_explanation = (
+                "AI explanation is currently unavailable. "
+                "Please review the model results with a qualified clinician."
+            )
+
 
         # ====================================================
         # SORT ALL PREDICTIONS
@@ -380,10 +426,8 @@ def predict():
         gradcam_error = None
 
 
-        if (
-            GRADCAM_AVAILABLE
-            and finding_detected
-            and top_disease
+        if GRADCAM_AVAILABLE and (
+            top_disease or result.get("raw_top_disease")
         ):
 
             try:
@@ -409,8 +453,15 @@ def predict():
                 )
 
 
-                class_index = DISEASES.index(
+                gradcam_target = (
                     top_disease
+                    if top_disease
+                    else result.get("raw_top_disease")
+                )
+
+
+                class_index = DISEASES.index(
+                    gradcam_target
                 )
 
 
@@ -479,94 +530,59 @@ def predict():
         # ====================================================
 
         response = {
-
             "success": True,
-
-            "message":
-                "X-ray analyzed successfully.",
-
-            "filename":
-                original_filename,
-
-            "uploaded_file":
-                "/uploads/" + unique_filename,
-
-
+            "message": "X-ray analyzed successfully.",
+            "filename": original_filename,
+            "uploaded_file": "/uploads/" + unique_filename,
             # ------------------------------------------------
             # DIRECT PREDICTION DATA
             # ------------------------------------------------
-
-            "predictions":
-                predictions,
-
-            "prediction_list":
-                prediction_list,
-
-            "sorted_predictions":
-                sorted_predictions,
-
-
+            "predictions": predictions,
+            "prediction_list": prediction_list,
+            "sorted_predictions": sorted_predictions,
             # ------------------------------------------------
             # CALIBRATED RESULTS
             # ------------------------------------------------
-
-            "detected_findings":
-                detected_findings,
-
-            "finding_detected":
-                finding_detected,
-
-            "calibrated_detection":
-                calibrated_detection,
-
-            "top_disease":
-                top_disease,
-
-            "top_percentage":
-                top_percentage,
-
-            "top_probability":
-                top_probability,
-
-            "threshold":
-                threshold,
-
-            "confidence_level":
-                confidence_level,
-
-
+            "detected_findings": detected_findings,
+            "finding_detected": finding_detected,
+            "calibrated_detection": calibrated_detection,
+            "top_disease": top_disease,
+            "top_percentage": top_percentage,
+            "top_probability": top_probability,
+            "threshold": threshold,
+            "confidence_level": confidence_level,
             # ------------------------------------------------
             # ALSO KEEP ORIGINAL NESTED STRUCTURE
             # ------------------------------------------------
-
             "prediction": result,
-
-
             # ------------------------------------------------
             # GRAD-CAM
             # ------------------------------------------------
-
-            "gradcam":
-                gradcam_url,
-
-            "gradcam_error":
-                gradcam_error,
-
-
+            "gradcam": gradcam_url,
+            "gradcam_error": gradcam_error,
             # ------------------------------------------------
             # MEDICAL DISCLAIMER
             # ------------------------------------------------
-
             "medical_disclaimer": (
                 "This AI output is for research and "
                 "educational purposes only and is not "
                 "a medical diagnosis. Clinical decisions "
                 "must be made by a qualified healthcare "
                 "professional."
-            )
-
+            ),
+            "ai_explanation": ai_explanation,
+            # ------------------------------------------------
+            # REPORT DATA
+            # ------------------------------------------------
+            "report_data": {
+                "predictions": predictions,
+                "top_disease": top_disease,
+                "top_probability": top_probability,
+                "threshold": threshold,
+                "calibrated_detection": calibrated_detection,
+                "detected_findings": detected_findings
+            }
         }
-
 
         # ====================================================
         # TERMINAL OUTPUT
@@ -578,70 +594,30 @@ def predict():
         print("=" * 70)
 
         if finding_detected:
-
-            print(
-                "Primary finding:",
-                top_disease
-            )
-
-            print(
-                "Model score:",
-                f"{top_probability * 100:.2f}%"
-            )
-
+            print("Primary finding:", top_disease)
+            print("Model score:", f"{top_probability * 100:.2f}%")
             if threshold is not None:
-
-                print(
-                    "Threshold:",
-                    f"{float(threshold) * 100:.2f}%"
-                )
-
+                print("Threshold:", f"{float(threshold) * 100:.2f}%")
         else:
-
-            print(
-                "No calibrated disease finding detected."
-            )
-
+            print("No calibrated disease finding detected.")
             if sorted_predictions:
+                print("Highest raw output:", sorted_predictions[0][0])
+                print("Highest raw score:", f"{sorted_predictions[0][1] * 100:.2f}%")
 
-                print(
-                    "Highest raw output:",
-                    sorted_predictions[0][0]
-                )
-
-                print(
-                    "Highest raw score:",
-                    f"{sorted_predictions[0][1] * 100:.2f}%"
-                )
-
-
-        print(
-            "Detected findings:"
-        )
-
+        print("Detected findings:")
         if detected_findings:
-
             for finding in detected_findings:
-
                 print(
                     f"  ✓ {finding['disease']}"
                     f" -> "
                     f"{finding['probability'] * 100:.2f}%"
                 )
-
         else:
-
-            print(
-                "  None"
-            )
-
+            print("  None")
 
         print("=" * 70)
 
-
-        return jsonify(
-            response
-        ), 200
+        return jsonify(response), 200
 
 
     # ========================================================
@@ -672,14 +648,55 @@ def predict():
         }), 500
 
 
-# ============================================================
-# SERVE UPLOADED IMAGES
-# ============================================================
+@app.route("/download-report", methods=["POST"])
+def download_report():
 
-@app.route(
-    "/uploads/<filename>",
-    methods=["GET"]
-)
+    try:
+        payload = request.get_json(silent=True)
+
+        if not payload:
+            return jsonify({
+                "success": False,
+                "error": "Missing JSON payload."
+            }), 400
+
+        report_data = payload.get("report_data") or payload
+
+        predictions = report_data.get("predictions")
+
+        if not isinstance(predictions, dict) or not predictions:
+            return jsonify({
+                "success": False,
+                "error": "No predictions available to generate a report."
+            }), 400
+
+        from report_generator import generate_report
+        from pdf_generator import generate_pdf
+
+        report = generate_report(predictions)
+
+        with NamedTemporaryFile(
+            suffix=".pdf",
+            delete=False
+        ) as tmpfile:
+            temp_path = tmpfile.name
+
+        generate_pdf(report, temp_path)
+
+        return send_file(
+            temp_path,
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name="MEDVISION_AI_Report.pdf"
+        )
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": "Could not generate or send the PDF report.",
+            "details": str(e)
+        }), 500
 def uploaded_file(filename):
 
     return send_from_directory(
@@ -724,6 +741,70 @@ def file_too_large(error):
         "success": False,
         "error": "Uploaded file is too large."
     }), 413
+
+
+# ============================================================
+# DISEASE CHAT
+# ============================================================
+
+@app.route("/disease-chat", methods=["POST"])
+@app.route("/disease-chat/", methods=["POST"])
+def disease_chat():
+
+    try:
+        payload = request.get_json(silent=True)
+
+        if not payload or "query" not in payload:
+            return jsonify({
+                "success": False,
+                "error": "Missing 'query' in request payload."
+            }), 400
+
+        query_text = str(payload["query"]).strip()
+
+        if not query_text:
+            return jsonify({
+                "success": False,
+                "error": "Query text is empty."
+            }), 400
+
+        disease_key = find_disease_by_query(query_text)
+
+        if not disease_key:
+            return jsonify({
+                "success": True,
+                "answer": (
+                    "I couldn't identify a supported disease from your question. "
+                    "Please ask about one of the listed chest X-ray findings."
+                ),
+                "query": query_text,
+                "disease": None
+            })
+
+        knowledge = DISEASE_KNOWLEDGE.get(disease_key, {})
+
+        answer = (
+            f"{disease_key.replace('_', ' ')}: "
+            f"{knowledge.get('meaning', 'Meaning unavailable.')} "
+            f"Why it matters: {knowledge.get('why_it_matters', 'Information unavailable.')} "
+            f"Action: {knowledge.get('action', 'Action guidance unavailable.')}"
+        )
+
+        return jsonify({
+            "success": True,
+            "answer": answer,
+            "query": query_text,
+            "disease": disease_key,
+            "knowledge": knowledge
+        }), 200
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "error": "Unable to process chat query.",
+            "details": str(e)
+        }), 500
 
 
 # ============================================================
